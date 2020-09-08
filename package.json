@@ -1,0 +1,14 @@
+{
+  "name": "excel-to-json",
+  "version": "1.0.0",
+  "description": "convert excel files into a json ",
+  "main": "index.js",
+  "repository": "https://github.com/kennedy-f/excel-to-json-node.git",
+  "author": "kennedy2000silva@hotmail.com",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  }
+}
