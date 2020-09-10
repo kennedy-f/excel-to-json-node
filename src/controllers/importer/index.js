@@ -21,7 +21,7 @@ module.exports = {
 		var response = {};
 		response.status = 'ok';
     response.data = models.jsonToModel(result);
-
+		// delete result['Balanço']; 
 		fs.unlinkSync(path);
 		return res.json(response);
 	},

@@ -1,7 +1,6 @@
 const moment = require('moment');
-const e = require('express');
 
-//modelo 1 dados em ingles/mesclados
+//modelo 1 dados em ingles e os em portugues
  /**
  * @summary Modelo 1 para apriori, converte o json recebido em um JSON com os dados em chaves corretas 
  * @param {object} sheet json da planilha a ser convertida em dados importaveis para a plataforma 
@@ -10,7 +9,7 @@ const e = require('express');
  */
 function aprioriModel(sheet) {
 	delete sheet['Balance Sheet'];
-  const model = createModel(sheet);
+	const model = createModel(sheet);
   return populateJson(model, sheet); ; 
 }
 
@@ -30,12 +29,14 @@ function createModel(sheet) {
 					sheet[key][index][alphabet(i)] === 'Opening Balance' ||
 					sheet[key][index][alphabet(i)] === 'Saldo Inicial'
 				) {
-					const model_version =
-						sheet[key][index][alphabet(i)] === 'Opening Balance'
-							? 'eng-US'
-							: 'pt-BR';
 					model[key] = {};
 					for (var j = 0; j < 26; j++) {
+						if ( sheet[key][index][alphabet(i)] === 'Saldo Inicial' && j === 0) { 
+							model[key]['Tipo'] = 'ASSETS'; 
+							model.version = 'eng'
+						} else { 
+							model.version = 'pt'
+						}
 						if (sheet[key][index][alphabet(j)]) {
 							if (!isNaN(sheet[key][index][alphabet(j)])) {
 								model[key][
@@ -50,9 +51,8 @@ function createModel(sheet) {
 				}
 			}
 		});
-  });
-
-
+	});
+	// console.log(model)
 	return model;
 }
 /**
@@ -67,14 +67,20 @@ function populateJson(model, sheets) {
     Object.keys(sheets[sheet]).forEach( row => { 
       result[row] = {};  
       Object.keys(model['TB Movimento']).forEach( (header,index) => { 
-        result[row][header] = sheets[sheet][row][alphabet(index)]
+				result[row][header] = sheets[sheet][row][alphabet(index)]; 
+				// console.log(row, header, sheets[sheet][row][alphabet(index)])
       }) 
-      //apaga as linhas que nao sao de dados. 
-      if (!result[row]['TYPE'] || result[row]['TYPE'] === 'TYPE')
-        delete result[row]; 
+			//apaga as linhas que nao sao de dados. 
+			console.log(model.version)
+      if ((!result[row]['TYPE'] || result[row]['TYPE'] === 'TYPE') && model.version == 'eng')
+				delete result[row]; 
+				
+			if ((!result[row]['CONTA'] || result[row]['CONTA'] === 'CONTA') && model.version == 'pt')
+				delete result[row]
       
     } )
-  });
+	});
+	console.log(result)
   result.last_update = moment().toISOString()
   return result; 
 }
