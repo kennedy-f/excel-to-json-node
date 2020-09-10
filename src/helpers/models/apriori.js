@@ -71,7 +71,6 @@ function populateJson(model, sheets) {
 				// console.log(row, header, sheets[sheet][row][alphabet(index)])
       }) 
 			//apaga as linhas que nao sao de dados. 
-			console.log(model.version)
       if ((!result[row]['TYPE'] || result[row]['TYPE'] === 'TYPE') && model.version == 'eng')
 				delete result[row]; 
 				
@@ -80,7 +79,6 @@ function populateJson(model, sheets) {
       
     } )
 	});
-	console.log(result)
   result.last_update = moment().toISOString()
   return result; 
 }
