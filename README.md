@@ -1,8 +1,6 @@
 # excel-to-json-node
 excel to json for nodeJS
 
-# Dillinger
-
 Rodar o repositorio 
 yarn install 
 yarn dev 
