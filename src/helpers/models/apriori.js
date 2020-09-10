@@ -32,9 +32,9 @@ function createModel(sheet) {
 					for (var j = 0; j < 26; j++) {
 						if (sheet[key][index][alphabet(i)] === 'Saldo Inicial' && j === 0) { 
 							model[key]['Tipo'] = 'ASSETS'; 
-							model.version = 'eng';
-						} else if (sheet[key][index][alphabet(i)] === 'Opening Balance' && j === 0 ) { 
 							model.version = 'pt';
+						} else if (sheet[key][index][alphabet(i)] === 'Opening Balance' && j === 0 ) { 
+							model.version = 'eng';
 						}
 						if (sheet[key][index][alphabet(j)]) {
 							if (!isNaN(sheet[key][index][alphabet(j)])) {
@@ -70,12 +70,13 @@ function populateJson(model, sheets) {
 				// console.log(row, header, sheets[sheet][row][alphabet(index)])
       }) 
 			//apaga as linhas que nao sao de dados. 
-      if ((!result[row]['TYPE'] || result[row]['TYPE'] === 'TYPE') && model.version == 'eng')
+      if (model.version == 'eng' && (!result[row]['TYPE'] || result[row]['TYPE'] === 'TYPE'))
 				delete result[row]; 
 				
-			if ((!result[row]['CONTA'] || result[row]['CONTA'] === 'CONTA') && model.version == 'pt')
-				console.log(model.version)
-				// delete result[row];
+			if (model.version == 'pt' && (!result[row]['CONTA'] || result[row]['CONTA'] === 'CONTA'))
+				delete result[row];
+
+				// console.log(model.version)
       
     } )
 	});
