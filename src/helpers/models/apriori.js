@@ -3,10 +3,10 @@ const e = require('express');
 
 //modelo 1 dados em ingles/mesclados
  /**
- * 
+ * @summary Modelo 1 para apriori, converte o json recebido em um JSON com os dados em chaves corretas 
  * @param {object} sheet json da planilha a ser convertida em dados importaveis para a plataforma 
  * @type {sheet} object
- * @returns Final JSON to export
+ * @returns JSON com as chaves corretas de cada dado 
  */
 function aprioriModel(sheet) {
 	delete sheet['Balance Sheet'];
@@ -16,7 +16,7 @@ function aprioriModel(sheet) {
 
 
 /**
- * function to generate a model from a sheet
+ * @summary function to generate a model from a sheet
  * @param {planilha} sheet - json 
  * @retunrs JSON - model from a sheet
  */
