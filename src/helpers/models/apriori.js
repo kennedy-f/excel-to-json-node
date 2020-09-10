@@ -1,7 +1,25 @@
 const moment = require('moment');
 const e = require('express');
-var isData = false;
+
 //modelo 1 dados em ingles/mesclados
+ /**
+ * 
+ * @param {object} sheet json da planilha a ser convertida em dados importaveis para a plataforma 
+ * @type {sheet} object
+ * @returns Final JSON to export
+ */
+function aprioriModel(sheet) {
+	delete sheet['Balance Sheet'];
+  const model = createModel(sheet);
+  return populateJson(model, sheet); ; 
+}
+
+
+/**
+ * function to generate a model from a sheet
+ * @param {planilha} sheet - json 
+ * @retunrs JSON - model from a sheet
+ */
 function createModel(sheet) {
 	var model = {};
 
@@ -37,7 +55,12 @@ function createModel(sheet) {
 
 	return model;
 }
-
+/**
+ * 
+ * @param {object} model modelo gerado para ser as chaves  
+ * @param {object} sheets planilha com os dados 
+ * @return JSON com os dados em suas devidas chaves. 
+ */
 function populateJson(model, sheets) { 
   var result = {} ;
   Object.keys(sheets).forEach( sheet => { 
@@ -46,7 +69,7 @@ function populateJson(model, sheets) {
       Object.keys(model['TB Movimento']).forEach( (header,index) => { 
         result[row][header] = sheets[sheet][row][alphabet(index)]
       }) 
-
+      //apaga as linhas que nao sao de dados. 
       if (!result[row]['TYPE'] || result[row]['TYPE'] === 'TYPE')
         delete result[row]; 
       
@@ -55,17 +78,12 @@ function populateJson(model, sheets) {
   result.last_update = moment().toISOString()
   return result; 
 }
-
-function aprioriModel(sheet) {
-	delete sheet['Balance Sheet'];
-	const model = createModel(sheet);
-  // console.log(model);
-  populateJson(model, sheet); 
-  return populateJson(model, sheet); ; 
-	// return populateJson(sheet, model);
-}
-
-function alphabet(n) {
+/**
+ * converte numeros em suas respectivas letras no alfabeto
+ * @param {number} n integer 
+ * @returns character 
+ */
+function alphabet( n) {
 	return `${(n + 10).toString(36).toUpperCase()}`;
 }
 
