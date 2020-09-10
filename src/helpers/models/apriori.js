@@ -26,77 +26,41 @@ function createModel(sheet) {
 								model[key][sheet[key][index][alphabet(j)]] =
 									sheet[key][index + 1][alphabet(j)];
 							}
-							model[key]['last_update'] = Date.now();
-							model['version'] = model_version;
 						}
 					}
 				}
 			}
 		});
-	});
+  });
+
+
 	return model;
 }
 
-function setRow(model, row) {
-  var result = {}; 
-	Object.keys(model).forEach((sheet) => {
-		Object.keys(model[sheet]).forEach((header) => {
-      for ( var i = 0; i < 26; i++ ) { 
-        // console.log(row[alphabet(i)])
-        result[header] = row[alphabet(i)]
-      }
-    })
+function populateJson(model, sheets) { 
+  var result = {} ;
+  Object.keys(sheets).forEach( sheet => { 
+    Object.keys(sheets[sheet]).forEach( row => { 
+      result[row] = {};  
+      Object.keys(model['TB Movimento']).forEach( (header,index) => { 
+        result[row][header] = sheets[sheet][row][alphabet(index)]
+      }) 
+
+      if (!result[row]['TYPE'] || result[row]['TYPE'] === 'TYPE')
+        delete result[row]; 
+      
+    } )
   });
-  // console.log(result)
-  return result;
-}
-
-function populateJson(sheets, model) {
-	var populateModel = {};
-	Object.keys(sheets).forEach((sheet) => {
-		Object.keys(sheets[sheet]).forEach((key) => {
-			headerRow(sheets[sheet][key]);
-			if (isData) {
-        result = setRow(model, sheets[sheet][key])
-        populateModel = result
-        // console.log(populateModel)
-			}
-		});
-  });
-  return populateModel; 
-}
-
-function headerRow(row) {
-	for (var i = 0; i < 26; i++) {
-		if (
-			row[alphabet(i)] === 'Opening Balance' ||
-			row[alphabet(i)] === 'Saldo Inicial'
-		) {
-			isData = true;
-			return true;
-		}
-	}
-}
-
-function footerRow(row){ 
-  for (var i = 0; i < 26; i++) {
-		if (
-			row[alphabet(i)] === 'Opening Balance' ||
-			row[alphabet(i)] === 'Saldo Inicial'
-		) {
-			isData = true;
-			return true;
-		}
-	}
+  result.last_update = moment().toISOString()
+  return result; 
 }
 
 function aprioriModel(sheet) {
 	delete sheet['Balance Sheet'];
 	const model = createModel(sheet);
   // console.log(model);
-  result = populateJson(sheet, model)
-  // console.log(result);
-  return result; 
+  populateJson(model, sheet); 
+  return populateJson(model, sheet); ; 
 	// return populateJson(sheet, model);
 }
 
