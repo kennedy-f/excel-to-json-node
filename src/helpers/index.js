@@ -1,20 +1,16 @@
 
 const apriori = require('./models/apriori')
 module.exports = {
+  /** 
+   * @param {object} sheet json
+   * @returns JSON model 
+   */  
   jsonToModel(sheet){ 
-    //if pra ver qual dos modelos ira utilizar - baseando-se na palavra chave. 
-    
     var model; 
-    if (sheet['Balance Sheet']) { 
+    //Apriori 
+    if (sheet['TB Movimento']) {  
       model = apriori.aprioriModel(sheet); 
       return model
-
     }
-    if (sheet['Balanço']){ 
-      model = apriori.aprioriModel(sheet);
-      return model; 
-    }
-      // console.log(sheet);
-    
   }
 }

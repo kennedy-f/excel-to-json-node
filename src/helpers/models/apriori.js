@@ -13,7 +13,6 @@ function aprioriModel(sheet) {
   return populateJson(model, sheet); ; 
 }
 
-
 /**
  * @summary function to generate a model from a sheet
  * @param {planilha} sheet - json 
@@ -31,11 +30,11 @@ function createModel(sheet) {
 				) {
 					model[key] = {};
 					for (var j = 0; j < 26; j++) {
-						if ( sheet[key][index][alphabet(i)] === 'Saldo Inicial' && j === 0) { 
+						if (sheet[key][index][alphabet(i)] === 'Saldo Inicial' && j === 0) { 
 							model[key]['Tipo'] = 'ASSETS'; 
-							model.version = 'eng'
-						} else { 
-							model.version = 'pt'
+							model.version = 'eng';
+						} else if (sheet[key][index][alphabet(i)] === 'Opening Balance' && j === 0 ) { 
+							model.version = 'pt';
 						}
 						if (sheet[key][index][alphabet(j)]) {
 							if (!isNaN(sheet[key][index][alphabet(j)])) {
@@ -62,7 +61,7 @@ function createModel(sheet) {
  * @return JSON com os dados em suas devidas chaves. 
  */
 function populateJson(model, sheets) { 
-  var result = {} ;
+	var result = {} ;
   Object.keys(sheets).forEach( sheet => { 
     Object.keys(sheets[sheet]).forEach( row => { 
       result[row] = {};  
@@ -75,7 +74,8 @@ function populateJson(model, sheets) {
 				delete result[row]; 
 				
 			if ((!result[row]['CONTA'] || result[row]['CONTA'] === 'CONTA') && model.version == 'pt')
-				delete result[row]
+				console.log(model.version)
+				// delete result[row];
       
     } )
 	});
