@@ -2,6 +2,8 @@
 // const xlsxtojson = require('xlsx-to-json-lc'); 
 
 const excelToJson = require('convert-excel-to-json')
+const fs = require('fs')
+const models = require('../../helpers/index');
 
 module.exports = {
   async reader (req,res) { 
@@ -9,18 +11,20 @@ module.exports = {
     if(!req.file) 
       return res.json({'error' : 'no file'}); 
 
-    const {originalname, path} = req.file;     // console.log( -1] === 'xlsx'); 
-    console.log(originalname.split('.')[originalname.split('.').length -1 ]);
+    const {originalname, path} = req.file;     
+
     const extension = originalname.split('.')[originalname.split('.').length -1 ]; 
 
-   
-
-    console.log(path); 
-    const result = excelToJson({
+    var result = excelToJson({
       sourceFile : path,
-      sheets: ['TB Movimento']
-    });                      
-    return res.json(result); 
+    });
+    var model = models.jsonToModel(result);
+    console.log('na index.js', model)
+
+    fs.unlinkSync(path)
+    return res.json({model : model.version}); 
+
+
     //Outra versao -- testar a atual com XLS se nao for possivel incluir a lib de csv-to-json e implementar a solucao abaixo
      // var excelToJson; 
 
