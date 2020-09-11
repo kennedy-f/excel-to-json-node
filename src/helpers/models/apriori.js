@@ -1,21 +1,20 @@
 const moment = require('moment');
-
 //modelo 1 dados em ingles e os em portugues
- /**
- * @summary Modelo 1 para apriori, converte o json recebido em um JSON com os dados em chaves corretas 
- * @param {object} sheet json da planilha a ser convertida em dados importaveis para a plataforma 
+/**
+ * @summary Modelo 1 para apriori, converte o json recebido em um JSON com os dados em chaves corretas
+ * @param {object} sheet json da planilha a ser convertida em dados importaveis para a plataforma
  * @type {sheet} object
- * @returns JSON com as chaves corretas de cada dado 
+ * @returns JSON com as chaves corretas de cada dado
  */
 function aprioriModel(sheet) {
 	delete sheet['Balance Sheet'];
 	const model = createModel(sheet);
-  return populateJson(model, sheet); ; 
+	return populateJson(model, sheet);
 }
 
 /**
  * @summary function to generate a model from a sheet
- * @param {planilha} sheet - json 
+ * @param {planilha} sheet - json
  * @retunrs JSON - model from a sheet
  */
 function createModel(sheet) {
@@ -30,10 +29,13 @@ function createModel(sheet) {
 				) {
 					model[key] = {};
 					for (var j = 0; j < 26; j++) {
-						if (sheet[key][index][alphabet(i)] === 'Saldo Inicial' && j === 0) { 
-							model[key]['Tipo'] = 'ASSETS'; 
+						if (sheet[key][index][alphabet(i)] === 'Saldo Inicial' && j === 0) {
+							model[key]['Tipo'] = 'ASSETS';
 							model.version = 'pt';
-						} else if (sheet[key][index][alphabet(i)] === 'Opening Balance' && j === 0 ) { 
+						} else if (
+							sheet[key][index][alphabet(i)] === 'Opening Balance' &&
+							j === 0
+						) {
 							model.version = 'eng';
 						}
 						if (sheet[key][index][alphabet(j)]) {
@@ -55,40 +57,45 @@ function createModel(sheet) {
 	return model;
 }
 /**
- * 
- * @param {object} model modelo gerado para ser as chaves  
- * @param {object} sheets planilha com os dados 
- * @return JSON com os dados em suas devidas chaves. 
+ *
+ * @param {object} model modelo gerado para ser as chaves
+ * @param {object} sheets planilha com os dados
+ * @return JSON com os dados em suas devidas chaves.
  */
-function populateJson(model, sheets) { 
-	var result = {} ;
-  Object.keys(sheets).forEach( sheet => { 
-    Object.keys(sheets[sheet]).forEach( row => { 
-      result[row] = {};  
-      Object.keys(model['TB Movimento']).forEach( (header,index) => { 
-				result[row][header] = sheets[sheet][row][alphabet(index)]; 
-				// console.log(row, header, sheets[sheet][row][alphabet(index)])
-      }) 
-			//apaga as linhas que nao sao de dados. 
-      if (model.version == 'eng' && (!result[row]['TYPE'] || result[row]['TYPE'] === 'TYPE'))
-				delete result[row]; 
-				
-			if (model.version == 'pt' && (!result[row]['CONTA'] || result[row]['CONTA'] === 'CONTA'))
-				delete result[row];
+function populateJson(model, sheets) {
+	var result = {};
+	result['indignos'] = {};
+	Object.keys(sheets).forEach((sheet) => {
+		Object.keys(sheets[sheet]).forEach((row) => {
+			result[row] = {};
 
-				// console.log(model.version)
-      
-    } )
+			Object.keys(model['TB Movimento']).forEach((header, index) => {
+				if (
+					Object.keys(model['TB Movimento']).length ===
+					Object.keys(sheets[sheet][row]).length && header !== sheets[sheet][row][alphabet(index)]
+				) {
+					result[row][header] = sheets[sheet][row][alphabet(index)];
+				} else if (Object.keys(sheets[sheet][row]).length > 10) {
+					if (!result['indignos'][row]) result['indignos'][row] = {};
+					result['indignos'][row][header] = sheets[sheet][row][alphabet(index)];
+				}
+			});
+			//Apaga a copia do cabecalho 
+			if ( result[row] && Object.keys(result[row]).length !== Object.keys(model['TB Movimento']).length) delete result[row]; 
+
+			//apaga as linhas sem dados importantes
+			if (Object.keys(result[row]).length === 0) delete result[row];
+		});
 	});
-  result.last_update = moment().toISOString()
-  return result; 
+	result.last_update = moment().toISOString();
+	return result;
 }
-/**
- * converte numeros em suas respectivas letras no alfabeto
- * @param {number} n integer 
- * @returns character 
- */
-function alphabet( n) {
+	/**
+	 * converte numeros em suas respectivas letras no alfabeto
+	 * @param {number} n integer
+	 * @returns character
+	 */
+function alphabet(n) {
 	return `${(n + 10).toString(36).toUpperCase()}`;
 }
 
