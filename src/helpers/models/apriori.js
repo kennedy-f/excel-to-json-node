@@ -70,21 +70,27 @@ function populateJson(model, sheets) {
 			result[row] = {};
 
 			Object.keys(model['TB Movimento']).forEach((header, index) => {
+			
+					// console.log(sheets[sheet][row][alphabet(index)])
+			
 				if (
+					result[row] &&
 					Object.keys(model['TB Movimento']).length ===
 					Object.keys(sheets[sheet][row]).length && header !== sheets[sheet][row][alphabet(index)]
 				) {
 					result[row][header] = sheets[sheet][row][alphabet(index)];
-				} else if (Object.keys(sheets[sheet][row]).length > 10) {
+				} else if (result[row] && Object.keys(sheets[sheet][row]).length > 10) {
 					if (!result['indignos'][row]) result['indignos'][row] = {};
 					result['indignos'][row][header] = sheets[sheet][row][alphabet(index)];
 				}
+				if (result[row] && !isNaN(sheets[sheet][row][alphabet(index)]) && moment(sheets[sheet][row][alphabet(index)]).format('MM/YYYY') === header) 
+					delete result[row];
+					// console.log(result[row])
 			});
 			//Apaga a copia do cabecalho 
-			if ( result[row] && Object.keys(result[row]).length !== Object.keys(model['TB Movimento']).length) delete result[row]; 
 
 			//apaga as linhas sem dados importantes
-			if (Object.keys(result[row]).length === 0) delete result[row];
+			if (result[row] && Object.keys(result[row]).length === 0) delete result[row];
 		});
 	});
 	result.last_update = moment().toISOString();
