@@ -7,6 +7,6 @@ const ImporterController = require('./controllers/importer');
 const routes = express.Router(); 
 const upload = multer(uploadConfig); 
 
-routes.post('/', upload.single('xlsx'), ImporterController.reader); 
+routes.post('/', upload.single('xlsx'), ImporterController.excelReader); 
 
 module.exports = routes; 

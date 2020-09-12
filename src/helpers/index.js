@@ -6,7 +6,7 @@ module.exports = {
 	 * @returns JSON model
 	 */
 	jsonToModel(sheet) {
-		var model;
+		let model;
 		//Apriori
 		if (sheet['TB Movimento']) {
 			model = apriori.aprioriModel(sheet);
